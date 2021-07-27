@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ljq.mybatis03.dao.StudentDao">
+    <!--
+        使用简单类型（8种+String）为参数
+        在#{}中的标识符可以随意去写
+        但是虽然可以随意写，还是要写的有意义
+    -->
+    <select id="getById" parameterType="string" resultType="student">
+        select * from tbl_student where id=#{id}
+    </select>
+    
+    <insert id="save">
+        insert into tbl_student(id,name,age) values(#{id},#{name},#{age})
+    </insert>
+    <select id="getAll" resultType="student">
+        select * from tbl_student
+    </select>
+    <select id="select5"  resultType="student">
+        select * from tbl_student where name=#{name} and age=#{age}
+    </select>
+    <select id="select6"  resultType="student">
+        select * from tbl_student where id='${value}'
+    </select>
+    <select id="select7"  resultType="student">
+        select * from tbl_student where name like '%${value}%'
+    </select>
+    <select id="select8"  resultType="student">
+        select * from tbl_student where name like '%' #{name} '%'
+    </select>
+
+    <!--
+        id:resultMap标签对的唯一标识
+            将来在使用到resultMap标签的时候，使用id来找到这组标签
+        type：指定一个类型，与数据库表一一对应，建立起表字段和属性的名字一一匹配的关系
+    -->
+    <resultMap id="stuMap" type="Student">
+        <!--
+            id标签：用来配置主键的对应关系
+            result标签：用来配置普通字段对应关系的
+            对于tbl_student表，表结果是一个id，两个普通字段
+            所以我们需要一个id标签和两个result标签
+            property属性：配置的是类中的属性名
+            column属性：配置的是表中的字段名
+            这样就能建立起类属性和表字段一一对应的关系了
+        -->
+        <id property="id" column="id"/>
+        <result property="name" column="fullname"/>
+        <result property="age" column="age"/>
+    </resultMap>
+    <select id="select9" resultMap="stuMap">
+        select * from tbl_student
+    </select>
+    <select id="select10" resultType="Student">
+        select * from tbl_student
+    /*
+        where标签：
+            当where标签在使用的时候，必须要搭配where标签对中的if标签来使用
+        通过if标签的判断，如果有查询条件，则展现where关键字，如果没有查询条件则不展现where关键字
+
+      */
+      <where>
+          <if test="name!=null and name!=''">
+              name like '%' #{name} '%'
+          </if>
+
+        <if test="age!=null and age!=''">
+            and age=25
+        </if>
+      </where>
+    </select>
+</mapper>
